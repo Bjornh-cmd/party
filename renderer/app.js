@@ -18,29 +18,35 @@ let candlesBlown = false;
 // Load config from file
 async function loadConfig() {
     try {
-        const response = await fetch('birthdayconfig.txt');
-        const text = await response.text();
-        const lines = text.split('\n');
-        
-        for (const line of lines) {
-            const trimmed = line.trim();
-            if (trimmed.startsWith('name=')) {
-                config.name = trimmed.split('=', 2)[1];
-            } else if (trimmed.startsWith('duration=')) {
-                const val = parseInt(trimmed.split('=', 2)[1]);
-                if (!isNaN(val)) config.duration = val;
-            } else if (trimmed.startsWith('musicUrl=')) {
-                config.musicUrl = trimmed.split('=', 2)[1];
-            } else if (trimmed.startsWith('date=')) {
-                config.date = trimmed.split('=', 2)[1];
-            } else if (trimmed.startsWith('cake=')) {
-                config.cake = trimmed.split('=', 2)[1];
-            } else if (trimmed.startsWith('blowMode=')) {
-                config.blowMode = trimmed.split('=', 2)[1] === 'true';
+        if (window.electronAPI) {
+            const configData = await window.electronAPI.getConfig();
+            Object.assign(config, configData);
+            console.log('Config loaded from Electron:', config);
+        } else {
+            // Fallback to fetch for web version
+            const response = await fetch('../birthdayconfig.txt');
+            const text = await response.text();
+            const lines = text.split('\n');
+            
+            for (const line of lines) {
+                const trimmed = line.trim();
+                if (trimmed.startsWith('name=')) {
+                    config.name = trimmed.split('=', 2)[1];
+                } else if (trimmed.startsWith('duration=')) {
+                    const val = parseInt(trimmed.split('=', 2)[1]);
+                    if (!isNaN(val)) config.duration = val;
+                } else if (trimmed.startsWith('musicUrl=')) {
+                    config.musicUrl = trimmed.split('=', 2)[1];
+                } else if (trimmed.startsWith('date=')) {
+                    config.date = trimmed.split('=', 2)[1];
+                } else if (trimmed.startsWith('cake=')) {
+                    config.cake = trimmed.split('=', 2)[1];
+                } else if (trimmed.startsWith('blowMode=')) {
+                    config.blowMode = trimmed.split('=', 2)[1] === 'true';
+                }
             }
+            console.log('Config loaded from file:', config);
         }
-        
-        console.log('Config loaded:', config);
     } catch (e) {
         console.log('Could not load config, using defaults');
     }
@@ -137,8 +143,16 @@ function closeParty() {
 }
 
 // Music playback
-function playMusic() {
+async function playMusic() {
     const audio = document.getElementById('default-song');
+    
+    if (window.electronAPI) {
+        // Electron version - get MP3 path from main process
+        const mp3Path = await window.electronAPI.getMp3Path();
+        if (mp3Path) {
+            audio.src = mp3Path;
+        }
+    }
     
     if (config.musicUrl) {
         audio.src = config.musicUrl;
@@ -226,9 +240,6 @@ function displayNameOnCake(name) {
     `;
     birthdayText.appendChild(cakeDiv);
     
-    // Initialize cake selector buttons
-    initializeCakeSelector();
-    
     // Add animations
     const style = document.createElement('style');
     style.textContent = `
@@ -258,79 +269,6 @@ function displayNameOnCake(name) {
     if (config.blowMode) {
         initializeBlowFeature();
     }
-}
-
-// Cake selector functionality
-function initializeCakeSelector() {
-    const cakeButtons = document.querySelectorAll('.cake-btn');
-    
-    // Set active state for current cake
-    cakeButtons.forEach(btn => {
-        if (btn.dataset.cake === config.cake) {
-            btn.classList.add('active');
-        }
-    });
-    
-    // Add click handlers
-    cakeButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const newCake = btn.dataset.cake;
-            config.cake = newCake;
-            
-            // Update active state
-            cakeButtons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            
-            // Update cake emoji on display
-            const cakeEmoji = document.getElementById('cake-emoji');
-            if (cakeEmoji) {
-                cakeEmoji.textContent = newCake;
-            }
-            
-            console.log('Cake changed to:', newCake);
-        });
-    });
-    
-    // Initialize blow toggle button
-    initializeBlowToggle();
-}
-
-// Blow toggle button functionality
-function initializeBlowToggle() {
-    const blowToggle = document.getElementById('blow-toggle');
-    if (!blowToggle) return;
-    
-    // Set initial state
-    if (config.blowMode) {
-        blowToggle.classList.add('active');
-        blowToggle.textContent = '🎤 Blaas: AAN';
-    }
-    
-    // Add click handler
-    blowToggle.addEventListener('click', () => {
-        config.blowMode = !config.blowMode;
-        
-        if (config.blowMode) {
-            blowToggle.classList.add('active');
-            blowToggle.textContent = '🎤 Blaas: AAN';
-            console.log('Blow mode enabled');
-            
-            // Initialize blow feature
-            if (!candlesBlown) {
-                initializeBlowFeature();
-            }
-        } else {
-            blowToggle.classList.remove('active');
-            blowToggle.textContent = '🎤 Blaas: UIT';
-            console.log('Blow mode disabled');
-            
-            // Hide blow hint
-            const blowHint = document.getElementById('blow-hint');
-            if (blowHint) {
-                blowHint.style.opacity = '0';
-            }
-        }
-    });
 }
 
 // Microphone blow feature

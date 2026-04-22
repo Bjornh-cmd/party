@@ -1,0 +1,58 @@
+{
+  "name": "happy-birthday-party",
+  "version": "2.1.0",
+  "description": "Happy Birthday Party Application",
+  "author": {
+    "name": "Birthday Party",
+    "email": "noreply@example.com"
+  },
+  "license": "MIT",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder",
+    "build-portable": "electron-builder --portable"
+  },
+  "build": {
+    "appId": "com.birthday.party",
+    "productName": "HappyBirthdayParty",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "renderer/**/*",
+      "birthdayconfig.txt",
+      "birthday.mp3"
+    ],
+    "extraResources": [
+      "birthdayconfig.txt",
+      "birthday.mp3"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "icon.ico"
+    },
+    "portable": {
+      "artifactName": "HappyBirthday-${version}-portable.exe"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
+  },
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.1"
+  },
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
