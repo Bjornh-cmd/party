@@ -1,36 +1,17 @@
-# Happy Birthday Configuratie Bestand
-# Stel hier de naam, datum, tijd en muziek in waarop het programma moet starten
+# Happy Birthday Configuratie Bestand (Web Versie)
+# Stel hier de naam, datum en duur in voor de web versie
 
 # Naam configuratie (verschijnt op de taart!)
-# Bijvoorbeeld: name=Sarah of name=Opa Jan
-name=mama
+name=mama!
 
 # Datum configuratie (formaat: DD-MM)
-# Bijvoorbeeld: 22-04 voor 22 april
+# De web versie start alleen op deze datum
+# Verwijder of zet op leeg om altijd te starten
 date=23-04
 
-# Tijd configuratie (formaat: HH:MM, 24-uurs formaat)
-# Bijvoorbeeld: 09:00 voor 9 uur 's ochtends
+# Duur configuratie (in seconden)
+duration=70
 
-# YouTube muziek configuratie (optioneel)
-# Voeg een YouTube link toe om automatisch muziek af te spelen
-# Formaat: youtube=https://www.youtube.com/watch?v=VIDEO_ID
-# Voorbeeld: youtube=https://www.youtube.com/watch?v=dQw4w9WgXcQ
-# Verwijder de 'youtube=' regel om het standaard Happy Birthday liedje te gebruiken
-
-# Duur configuratie (optioneel)
-# Stel in hoe lang het programma moet draaien voordat het automatisch sluit
-# Formaat: duration=XX (in seconden)
-# Voorbeeld: duration=60 voor 1 minuut, duration=300 voor 5 minuten
-# Standaard: 180 seconden (3 minuten) als niet ingesteld
-# Voor YouTube: 240 seconden (4 minuten) als niet ingesteld
-# Voor MP3: 180 seconden (3 minuten) als niet ingesteld
-# Voor standaard liedje: 15 seconden als niet ingesteld
-duration=62
-
-# Extra opties:
-# - Als de datum en tijd niet overeenkomen, start het programma niet
-# - Het programma start in fullscreen modus (druk ESC om fullscreen te verlaten)
-# - Het programma sluit automatisch na 30 seconden
-# - Verwijder de 'date=' regel om elke dag te starten
-# - Verwijder de 'time=' regel om altijd te starten op de ingestelde datum
+# Muziek URL (optioneel)
+# Als leeg gelaten, wordt birthday.mp3 gebruikt
+# musicUrl=https://voorbeeld.com/muziek.mp3
