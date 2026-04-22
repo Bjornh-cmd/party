@@ -1,5 +1,5 @@
 # Happy Birthday Configuratie Bestand (Web Versie)
-# Stel hier de naam, datum en duur in voor de web versie
+# Stel hier de naam, datum, duur, taart en blazen in voor de web versie
 
 # Naam configuratie (verschijnt op de taart!)
 name=mama!
@@ -11,6 +11,14 @@ date=23-04
 
 # Duur configuratie (in seconden)
 duration=70
+
+# Taart selectie (emoji)
+# Opties: 🎂, 🍰, 🧁, 🥧, 🍩, 🎂🕯️
+cake=🎂
+
+# Blaas op kaarsen (microfoon vereist)
+# true = blaas functie aan, false = uit
+blowMode=false
 
 # Muziek URL (optioneel)
 # Als leeg gelaten, wordt birthday.mp3 gebruikt

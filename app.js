@@ -290,6 +290,47 @@ function initializeCakeSelector() {
             console.log('Cake changed to:', newCake);
         });
     });
+    
+    // Initialize blow toggle button
+    initializeBlowToggle();
+}
+
+// Blow toggle button functionality
+function initializeBlowToggle() {
+    const blowToggle = document.getElementById('blow-toggle');
+    if (!blowToggle) return;
+    
+    // Set initial state
+    if (config.blowMode) {
+        blowToggle.classList.add('active');
+        blowToggle.textContent = '🎤 Blaas: AAN';
+    }
+    
+    // Add click handler
+    blowToggle.addEventListener('click', () => {
+        config.blowMode = !config.blowMode;
+        
+        if (config.blowMode) {
+            blowToggle.classList.add('active');
+            blowToggle.textContent = '🎤 Blaas: AAN';
+            console.log('Blow mode enabled');
+            
+            // Initialize blow feature
+            if (!candlesBlown) {
+                initializeBlowFeature();
+            }
+        } else {
+            blowToggle.classList.remove('active');
+            blowToggle.textContent = '🎤 Blaas: UIT';
+            console.log('Blow mode disabled');
+            
+            // Hide blow hint
+            const blowHint = document.getElementById('blow-hint');
+            if (blowHint) {
+                blowHint.style.opacity = '0';
+            }
+        }
+    });
 }
 
 // Microphone blow feature

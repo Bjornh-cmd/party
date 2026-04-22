@@ -217,3 +217,30 @@ h1 {
     background: rgba(102, 126, 234, 0.3);
     transform: scale(1.1);
 }
+
+.blow-toggle-btn {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 12px 25px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+}
+
+.blow-toggle-btn:hover {
+    transform: translateX(-50%) scale(1.05);
+    background: rgba(255, 255, 255, 1);
+}
+
+.blow-toggle-btn.active {
+    background: rgba(102, 126, 234, 0.9);
+    color: white;
+}
