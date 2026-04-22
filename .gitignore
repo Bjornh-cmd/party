@@ -1,4 +1,4 @@
-# Ignore everything except root files and web server
+# Ignore everything except root files
 *
 !index.html
 !style.css
@@ -6,6 +6,5 @@
 !birthdayconfig.txt
 !birthday.mp3
 !vercel.json
-!web/
-!web/server.js
+!server.js
 !.gitignore
