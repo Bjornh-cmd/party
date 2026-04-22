@@ -111,13 +111,31 @@ h1 {
     font-weight: 500;
 }
 
-#config-panel input {
+#config-panel input[type="text"],
+#config-panel input[type="number"] {
     width: 100%;
     padding: 10px;
     margin-top: 5px;
     border: 2px solid #ddd;
     border-radius: 8px;
     font-size: 1rem;
+}
+
+#config-panel select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    background: white;
+    cursor: pointer;
+}
+
+#config-panel input[type="checkbox"] {
+    margin-top: 5px;
+    transform: scale(1.2);
+    cursor: pointer;
 }
 
 #config-panel input:focus {
@@ -164,4 +182,38 @@ h1 {
 
 #open-config:hover {
     opacity: 1;
+}
+
+#cake-selector {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 15px 25px;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+}
+
+.cake-btn {
+    font-size: 2.5rem;
+    padding: 10px 15px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.cake-btn:hover {
+    transform: scale(1.2);
+    background: rgba(102, 126, 234, 0.1);
+}
+
+.cake-btn.active {
+    background: rgba(102, 126, 234, 0.3);
+    transform: scale(1.1);
 }

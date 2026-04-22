@@ -11,8 +11,9 @@ resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
 // Configuration
-let config = { duration: 60, name: null, musicUrl: null, date: null };
+let config = { duration: 60, name: null, musicUrl: null, date: null, cake: '🎂', blowMode: false };
 let partyStarted = false;
+let candlesBlown = false;
 
 // Load config from file
 async function loadConfig() {
@@ -32,6 +33,10 @@ async function loadConfig() {
                 config.musicUrl = trimmed.split('=', 2)[1];
             } else if (trimmed.startsWith('date=')) {
                 config.date = trimmed.split('=', 2)[1];
+            } else if (trimmed.startsWith('cake=')) {
+                config.cake = trimmed.split('=', 2)[1];
+            } else if (trimmed.startsWith('blowMode=')) {
+                config.blowMode = trimmed.split('=', 2)[1] === 'true';
             }
         }
         
@@ -85,10 +90,14 @@ startBtn.addEventListener('click', () => {
     const inputName = document.getElementById('name-input').value;
     const inputDuration = document.getElementById('duration-input').value;
     const inputMusicUrl = document.getElementById('music-url').value;
+    const selectedCake = document.getElementById('cake-select').value;
+    const blowMode = document.getElementById('blow-mode').checked;
     
     if (inputName) config.name = inputName;
     if (inputDuration) config.duration = parseInt(inputDuration) || 60;
     if (inputMusicUrl) config.musicUrl = inputMusicUrl;
+    config.cake = selectedCake;
+    config.blowMode = blowMode;
     
     configPanel.classList.remove('show');
     startParty();
@@ -136,7 +145,17 @@ function playMusic() {
     }
     
     audio.volume = 0.5;
-    audio.play().catch(e => console.log('Audio play failed:', e));
+    
+    // Try to play with user interaction
+    audio.play().catch(e => {
+        console.log('Audio autoplay blocked, waiting for user interaction');
+        // Add click listener to play audio on first interaction
+        const playOnInteraction = () => {
+            audio.play().catch(err => console.log('Audio play failed:', err));
+            document.removeEventListener('click', playOnInteraction);
+        };
+        document.addEventListener('click', playOnInteraction);
+    });
 }
 
 // Display name on cake
@@ -168,11 +187,11 @@ function displayNameOnCake(name) {
     `;
     
     cakeDiv.innerHTML = `
-        <div style="
+        <div id="cake-emoji" style="
             font-size: 5rem;
             margin-bottom: 10px;
             filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
-        ">🎂</div>
+        ">${config.cake}</div>
         <div class="rainbow-name" style="
             font-size: 3rem;
             font-weight: 800;
@@ -197,8 +216,18 @@ function displayNameOnCake(name) {
             text-transform: uppercase;
             text-shadow: 3px 3px 6px rgba(0,0,0,0.7);
         ">${name}</div>
+        <div id="blow-hint" style="
+            font-size: 1.2rem;
+            color: #fff;
+            margin-top: 20px;
+            opacity: 0;
+            transition: opacity 0.5s;
+        ">🎤 Blaas op de kaarsen!</div>
     `;
     birthdayText.appendChild(cakeDiv);
+    
+    // Initialize cake selector buttons
+    initializeCakeSelector();
     
     // Add animations
     const style = document.createElement('style');
@@ -211,8 +240,145 @@ function displayNameOnCake(name) {
             0% { background-position: 0% 50%; }
             100% { background-position: 400% 50%; }
         }
+        @keyframes candle-flicker {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(0.95); }
+        }
+        .candle-out {
+            animation: candle-out 0.5s forwards;
+        }
+        @keyframes candle-out {
+            0% { opacity: 1; }
+            100% { opacity: 0; transform: scale(0.5); }
+        }
     `;
     document.head.appendChild(style);
+    
+    // Initialize blow feature if enabled
+    if (config.blowMode) {
+        initializeBlowFeature();
+    }
+}
+
+// Cake selector functionality
+function initializeCakeSelector() {
+    const cakeButtons = document.querySelectorAll('.cake-btn');
+    
+    // Set active state for current cake
+    cakeButtons.forEach(btn => {
+        if (btn.dataset.cake === config.cake) {
+            btn.classList.add('active');
+        }
+    });
+    
+    // Add click handlers
+    cakeButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const newCake = btn.dataset.cake;
+            config.cake = newCake;
+            
+            // Update active state
+            cakeButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            
+            // Update cake emoji on display
+            const cakeEmoji = document.getElementById('cake-emoji');
+            if (cakeEmoji) {
+                cakeEmoji.textContent = newCake;
+            }
+            
+            console.log('Cake changed to:', newCake);
+        });
+    });
+}
+
+// Microphone blow feature
+function initializeBlowFeature() {
+    const blowHint = document.getElementById('blow-hint');
+    if (blowHint) {
+        blowHint.style.opacity = '1';
+    }
+    
+    // Request microphone access
+    navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+            const audioContext = new AudioContext();
+            const analyser = audioContext.createAnalyser();
+            const microphone = audioContext.createMediaStreamSource(stream);
+            microphone.connect(analyser);
+            
+            analyser.fftSize = 256;
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            
+            let blowCount = 0;
+            const blowThreshold = 50;
+            const requiredBlows = 3;
+            
+            function detectBlow() {
+                analyser.getByteFrequencyData(dataArray);
+                
+                // Calculate average volume
+                let sum = 0;
+                for (let i = 0; i < dataArray.length; i++) {
+                    sum += dataArray[i];
+                }
+                const average = sum / dataArray.length;
+                
+                // Detect blow (sudden loud sound)
+                if (average > blowThreshold && !candlesBlown) {
+                    blowCount++;
+                    console.log('Blow detected! Count:', blowCount);
+                    
+                    if (blowCount >= requiredBlows) {
+                        blowOutCandles();
+                        candlesBlown = true;
+                        blowCount = 0;
+                    }
+                }
+                
+                requestAnimationFrame(detectBlow);
+            }
+            
+            detectBlow();
+        })
+        .catch(err => {
+            console.log('Microphone access denied:', err);
+            if (blowHint) {
+                blowHint.textContent = '🎤 Microfoon niet beschikbaar';
+            }
+        });
+}
+
+function blowOutCandles() {
+    const cakeEmoji = document.getElementById('cake-emoji');
+    const blowHint = document.getElementById('blow-hint');
+    
+    if (cakeEmoji) {
+        // Change cake emoji to show candles blown out
+        const baseCake = config.cake.replace('🕯️', '').trim();
+        cakeEmoji.textContent = baseCake + '💨';
+        cakeEmoji.style.animation = 'candle-flicker 0.5s';
+        
+        setTimeout(() => {
+            cakeEmoji.textContent = '🎉';
+            // Add confetti burst
+            for (let i = 0; i < 50; i++) {
+                const conf = new Confetti();
+                conf.x = canvas.width / 2;
+                conf.y = canvas.height / 2;
+                conf.vx = (Math.random() - 0.5) * 15;
+                conf.vy = (Math.random() - 0.5) * 15 - 10;
+                confettis.push(conf);
+            }
+        }, 500);
+    }
+    
+    if (blowHint) {
+        blowHint.textContent = '🎉 Gefeliciteerd!';
+        setTimeout(() => {
+            blowHint.style.opacity = '0';
+        }, 2000);
+    }
 }
 
 // Balloon class

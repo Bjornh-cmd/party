@@ -14,6 +14,16 @@
         <div class="subtitle">Veel plezier met je dag!</div>
     </div>
     
+    <!-- Cake Selector -->
+    <div id="cake-selector">
+        <button class="cake-btn" data-cake="🎂">🎂</button>
+        <button class="cake-btn" data-cake="🍰">🍰</button>
+        <button class="cake-btn" data-cake="🧁">🧁</button>
+        <button class="cake-btn" data-cake="🥧">🥧</button>
+        <button class="cake-btn" data-cake="🍩">🍩</button>
+        <button class="cake-btn" data-cake="🎂🕯️">🎂🕯️</button>
+    </div>
+    
     <div id="timer">60</div>
     
     <!-- Audio element for music -->
@@ -36,6 +46,21 @@
         <label>
             Muziek URL (optioneel):
             <input type="text" id="music-url" placeholder="https://...">
+        </label>
+        <label>
+            Kies een taart:
+            <select id="cake-select">
+                <option value="🎂">Chocolade Taart 🎂</option>
+                <option value="🍰">Slagroom Taart 🍰</option>
+                <option value="🧁">Cupcake 🧁</option>
+                <option value="🥧">Appeltaart 🥧</option>
+                <option value="🍩">Donut 🍩</option>
+                <option value="🎂🕯️">Taart met Kaarsjes 🎂🕯️</option>
+            </select>
+        </label>
+        <label>
+            <input type="checkbox" id="blow-mode">
+            Blaas op de kaarsen! (microfoon vereist)
         </label>
         <button id="start-btn">Start! 🎉</button>
         <button id="close-config">Sluiten</button>
